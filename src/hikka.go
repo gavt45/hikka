@@ -37,6 +37,7 @@ var port int
 var ping bool
 var logins_file string
 var passwords_file string
+var hosts_file string
 var shoots_path string
 var json_file string
 var csv_file string
@@ -343,6 +344,7 @@ func parseFlags() {
 	flag.IntVar(&bf_threads, "bf-threads", 1, "Bruteforcer threads count")
 	flag.IntVar(&port, "port", 8000, "Camera service port")
 	flag.BoolVar(&ping, "check", false, "Check cameras (experimental and not fully tested, but very useful)")
+	flag.StringVar(&hosts_file, "hosts", "hosts", "A file with a list of camera's ips")
 	flag.StringVar(&logins_file, "logins", "logins", "A file with a list of logins to bruteforce")
 	flag.StringVar(&passwords_file, "passwords", "passwords", "A file with a list of passwords to bruteforce")
 	flag.StringVar(&shoots_path, "shoots", "", "Download pics from cameras into a folder")
@@ -359,7 +361,6 @@ func initialize() {
 	logins, err = readLines(logins_file)
 	if err != nil {
 		fmt.Println(err)
-
 		return
 	}
 	fmt.Println("Loaded", len(logins), "logins")
@@ -386,8 +387,7 @@ func initialize() {
 		}
 	}
 
-	fmt.Println("Starting work in", threads, "threads")
-	fmt.Println()
+	fmt.Println("Starting work in", threads, "threads\n")
 }
 
 func start() {
@@ -440,6 +440,8 @@ func start() {
 	ipCh := make(chan string)
 	bg := new(sync.WaitGroup)
 
+	info.Println("Spawning coroutines...")
+
 	for i := 0; i < threads; i++ {
 		bg.Add(1)
 		go func() {
@@ -450,8 +452,10 @@ func start() {
 		}()
 	}
 
+	info.Println("Done!")
+
 	// Sending IPs to bruteforce coroutines
-	inFile, err := os.Open("hosts")
+	inFile, err := os.Open(hosts_file)
 	if err != nil {
 		panic(err)
 	}
@@ -477,7 +481,6 @@ func main() {
 
 	if port < 0 || port > 0xFFFF {
 		err.Println("Wrong port value")
-
 		os.Exit(-1)
 	}
 
