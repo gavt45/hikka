@@ -3,6 +3,15 @@ package main
 /*
 #include "HCNetSDK.h"
 #include <stdlib.h>
+//wrappers:
+LONG WNET_DVR_Login(const char *sDVRIP, const WORD wDVRPort, const char *sUserName, const char *sPassword, NET_DVR_DEVICEINFO *device){
+	return NET_DVR_Login(sDVRIP, wDVRPort, sUserName, sPassword, device);
+}
+
+BOOL WNET_DVR_CaptureJPEGPicture(LONG lUserID, LONG lChannel, NET_DVR_JPEGPARA *lpJpegPara, const char *sPicFileName){
+	return NET_DVR_CaptureJPEGPicture(lUserID, lChannel, lpJpegPara, sPicFileName);
+}
+
 */
 import "C"
 import (
@@ -17,6 +26,7 @@ import (
 	"sync"
 	"time"
 	"unsafe"
+
 	// "encoding/json"
 	"github.com/fatih/color"
 )
@@ -102,7 +112,7 @@ func getSnapshots(ip string, uid int64, startChannel int, count int, login strin
 		imgParams.wPicQuality = 0
 		imgParams.wPicSize = 0
 
-		result := C.NET_DVR_CaptureJPEGPicture(
+		result := C.WNET_DVR_CaptureJPEGPicture(
 			(C.LONG)(uid),
 			(C.LONG)(i),
 			(*C.NET_DVR_JPEGPARA)(unsafe.Pointer(&imgParams)),
@@ -192,7 +202,7 @@ func checkLogin(ip string, login string, password string, results chan DeviceInf
 	c_password := C.CString(password)
 	defer C.free(unsafe.Pointer(c_password))
 
-	uid := (int64)(C.NET_DVR_Login(
+	uid := (int64)(C.WNET_DVR_Login(
 		c_ip,
 		C.WORD(port),
 		c_login,
