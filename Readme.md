@@ -1,4 +1,4 @@
-#hikka — IP camera bruteforcer based on Hikvision SDK.
+# hikka — IP camera bruteforcer based on Hikvision SDK.
 
 ---
 
