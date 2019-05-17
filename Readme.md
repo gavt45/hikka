@@ -2,6 +2,28 @@
 
 ---
 
+## Mod
+Made workaround patch to hikka.go to avoid linux build errors. (i.e 
+```# command-line-arguments
+cgo-gcc-prolog: In function ‘_cgo_1234567890_Cfunc_NET_DVR_CaptureJPEGPicture’:
+cgo-gcc-prolog:44:47: warning: passing argument 3 of ‘NET_DVR_CaptureJPEGPicture’ from incompatible pointer type [-Wincompatible-pointer-types]
+In file included from src/hikka.go:4:0:
+hikka/include/HCNetSDK.h:13330:28: note: expected ‘LPNET_DVR_JPEGPARA {aka struct <anonymous> *}’ but argument is of type ‘struct <anonymous> *’
+ NET_DVR_API BOOL __stdcall NET_DVR_CaptureJPEGPicture(LONG lUserID, LONG lChannel, LPNET_DVR_JPEGPARA lpJpegPara, const char *sPicFileName);
+                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+cgo-gcc-prolog: In function ‘_cgo_18b01f590f00_Cfunc_NET_DVR_Login’:
+cgo-gcc-prolog:143:48: warning: passing argument 5 of ‘NET_DVR_Login’ from incompatible pointer type [-Wincompatible-pointer-types]
+In file included from src/hikka.go:4:0:
+hikka/include/HCNetSDK.h:13117:28: note: expected ‘LPNET_DVR_DEVICEINFO {aka struct <anonymous> *}’ but argument is of type ‘struct <anonymous> *’
+ NET_DVR_API LONG __stdcall NET_DVR_Login(const char *sDVRIP, const WORD wDVRPort, const char *sUserName, const char *sPassword, LPNET_DVR_DEVICEINFO lpDeviceInfo);
+                            ^~~~~~~~~~~~~
+# command-line-arguments
+src/hikka.go:109: cannot use _Ctype_LPNET_DVR_JPEGPARA(unsafe.Pointer(&imgParams)) (type _Ctype_LPNET_DVR_JPEGPARA) as type *_Ctype_struct___7 in argument to _Cfunc_NET_DVR_CaptureJPEGPicture
+src/hikka.go:201: cannot use _Ctype_LPNET_DVR_DEVICEINFO(unsafe.Pointer(&device)) (type _Ctype_LPNET_DVR_DEVICEINFO) as type *_Ctype_struct___6 in argument to _Cfunc_NET_DVR_Login
+make: *** [linux] Error 2
+``` 
+)
+
 ## Building
 
 I'm using a makefile, so you should be able to build it under Linux using this command:
